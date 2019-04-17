@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">	
+<head>
+	{% load static %}
+	<!-- Bootstrap CSS files-->
+	<link rel="stylesheet" href="{% static 'main/css/bootstrap.css' %}">
+
+	<!-- Google Open Sans web font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700" rel="stylesheet">
+
+	<!-- Font Awesome Web Icons -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
+	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<meta charset="UTF-8">
+    <title></title>
+    <script src="http://d3js.org/d3.v3.min.js" language="JavaScript"></script>
+    <script src="{% static 'main/js/liquidFillGauge.js' %}"></script>
+    <style>
+        .liquidFillGaugeText { font-family: Helvetica; font-weight: bold; }
+    </style>
+	<style>
+		canvas{
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
+	</style>
+</head>
+
+<body>
+	<script type="text/javascript">
+		var today_data = {{ today_data }};
+    	var today_labels = {{ today_labels|safe }};
+    	var week_data = {{ week_data }};
+    	var week_labels = {{ week_labels|safe }};
+    	var month_data = {{ month_data }};
+    	var month_labels = {{ month_labels|safe }};
+    	var year_data = {{ year_data }};
+    	var year_labels = {{ year_labels|safe }};
+	</script>
+	<div class="row"></div>
+	<bs-docs-section>
+		<div class="row">
+			<div class="col-4">
+				<svg id="fillgauge1" width="25%" height="200" onclick="gauge1.update(NewValue());"></svg>
+				<svg id="fillgauge2" width="25%" height="200" onclick="gauge2.update(NewValue());"></svg>
+			</div>
+			<div class="col-4">
+				<div class="page-header">
+					<img src="{% static 'main/img/trek.jpg' %}" alt="trek logo" style="width: 100%;height: 120px">
+				</div>
+				<bs-component>
+					<div class="jumbotron" style="padding: 20px">
+						<div class="col" id="tweetFeed">
+							<div class="list-group" id="feed">
+								<script type="text/javascript" src="{% static 'main/js/feed.js' %}"></script>
+							</div>
+						</div>
+					</div> 
+				</bs-component>
+				<div>
+					<form method="post">
+						{% csrf_token %}
+						  <fieldset>
+						    <div class="form-group">
+						    	<ul class="nav nav-pills flex-column">
+	  								<li class="nav-item">
+	    								<a class="nav-link active" href="#">Respond to Tweet</a>
+	 								</li>
+	 							</ul>
+						      <textarea class="form-control" id="tweetTextArea" rows="3"></textarea>
+						    </div>
+						    <button class="btn btn-danger" type="submit" id="tweetSubmit" style="float: right">Submit</button>
+						  </fieldset>
+					</form>
+				</div>
+			</div>
+			<div class="col-4">
+				<div id="cloud" style="width:100%">
+					<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+					<script src="https://d3js.org/d3.v5.min.js"></script>
+					<script type="text/javascript" src="{% static 'main/js/d3.layout.cloud.js' %}"></script>
+					<script type="text/javascript" src="{% static 'main/js/easywordcloud.js' %}"></script>
+					<script type="text/javascript" src="{% static 'main/js/easy.js' %}"></script>
+				</div>
+				<div>
+					<div style="width:100%">
+						<canvas id="canvas" style="width:100%"></canvas>
+					</div>
+					<br>
+					<br>
+					<script type="text/javascript" src="{% static 'main/js/mainWindow.js' %}"></script>
+					<div class="btn-group btn-block">
+						<button class="btn btn-outline-danger" type="button" id="Live">Live</button>
+						<button class="btn btn-outline-primary" type="button" id="24_Hour" width="15%" onclick="makeChart(today_labels, today_data, 'day')">Day</button>
+						<button class="btn btn-outline-success" type="button" id="1_Week" width="15%" onclick="makeChart(week_labels, week_data, 'week')">Week</button>
+						<button class="btn btn-outline-info" type="button" id="1_Month" width="15%" onclick="makeChart(month_labels, month_data, 'month')">Month</button>
+						<button class="btn btn-outline-warning" type="button" id="1_Year" width="15%" onclick="makeChart(year_labels, year_data, 'year')">Year</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</bs-docs-section>
+</div>
+
+<script language="JavaScript">
+	var count = 0;
+	var counts = 0;
+	var male = 0;
+	var female = 0;
+	var Twitter_Userss = unescape('{{Twitter_Users | escapejs}}');
+	var Twitter_Users = JSON.parse(Twitter_Userss);
+	var tweet_places = unescape('{{tweet_place | escapejs}}');
+	var tweet_place = JSON.parse(tweet_places);
+	console.log(Twitter_Users)
+	for (user in Twitter_Users['data']) {
+		if (Twitter_Users['data'][user]=="male") {
+			male+=1;
+		} else {
+			female+=1;
+		}
+	}
+	for (locations in tweet_place['places']) {
+		if (tweet_place['places'][locations]!='null') {
+			count+=1;
+		}
+		counts+=1;
+	}
+	console.log("counts");
+	console.log(counts);
+	console.log("count");
+	console.log(count);
+	console.log("male")
+	console.log(male)
+	console.log("female")
+	console.log(female)
+	console.log(male/(female+male))
+	var config1 = liquidFillGaugeDefaultSettings();
+	config1.circleColor = "#FF7777";
+	config1.textColor = "#FF4444";
+	config1.waveTextColor = "#FFAAAA";
+	config1.waveColor = "#FFDDDD";
+	config1.circleThickness = 0.2;
+	config1.circleFillGap = 0.2;
+	config1.textVertPosition = 0.8;
+	config1.waveAnimateTime = 2000;
+	config1.waveHeight = 0.3;
+	config1.waveCount = 1;
+	var config2 = liquidFillGaugeDefaultSettings();
+	config2.circleThickness = 0.2;
+	config2.circleFillGap = 0.2;
+	config2.textVertPosition = 0.8;
+	config2.waveAnimateTime = 2000;
+	config2.waveHeight = 0.3;
+	config2.waveCount = 1;
+
+	var gauge1 = loadLiquidFillGauge("fillgauge1", 100*male/(male+female),config2);
+	var gauge2= loadLiquidFillGauge("fillgauge2", 100*female/(male+female), config1);
+	function NewValue(){
+		if(Math.random() > .5){
+			return Math.round(Math.random()*100);
+		} else {
+			return (Math.random()*100).toFixed(1);
+		}
+	}
+</script>
+
+</body>
+
+</html>

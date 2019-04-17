@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">	
+<head>
+	{% load static %}
+	<!-- Bootstrap CSS files-->
+	<link rel="stylesheet" href="{% static 'main/css/bootstrap.css' %}">
+
+	<!-- Google Open Sans web font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700" rel="stylesheet">
+
+	<!-- Font Awesome Web Icons -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
+	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+	<style>
+	canvas{
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+</head>
+
+<body>
+	<div class="row"></div>
+	<bs-docs-section>
+		<div class="row">
+			<div class="col-4"></div>
+			<div class="col-4">
+				<div class="page-header">
+					<img src="{% static 'main/img/trek.jpg' %}" alt="trek logo" style="width: 100%;height: 120px">
+				</div>
+				<bs-component>
+					<div class="jumbotron" style="padding: 20px">
+						<div class="col">
+							<div class="list-group">
+								{% for tweet in Tweets %}
+								<a class="list-group-item list-group-item-action flex-column align-items-start active" href="#">
+									<div class="d-flex w-100 justify-content-between" style="height: 50px">
+										<h5 class="mb-1">{{tweet.tweet_user_user_name}}</h5>
+										<small>{{tweet.tweet_created_at}}</small>
+									</div>
+									<p class="m-0">{{tweet.tweet_text}}</p>
+									<small>{{tweet.tweet_user_location}}</small>
+								</a>
+								{% endfor %}
+							</div>
+						</div>
+					</div> 
+				</bs-component>
+			</div>
+			<div class="col-4">
+				<div class="media">
+					<img src="{% static 'main/img/wordcloud.png' %}" alt="wordcloud" style="width: 100%;height: 400px">
+				</div>
+				<div>
+					<div style="width:100%;">
+						<canvas id="canvas"></canvas>
+					</div>
+					<br>
+					<br>
+					<button id="randomizeData">Randomize Data</button>
+					<button id="addDataset">Add Dataset</button>
+					<button id="removeDataset">Remove Dataset</button>
+					<button id="addData">Add Data</button>
+					<button id="removeData">Remove Data</button>
+					<script type="text/javascript" src="{% static 'main/js/24hourchart.js' %}"></script>>
+				</div>
+			</div>
+		</div>
+	</bs-docs-section>
+	</div>
+</body>
+</html>
